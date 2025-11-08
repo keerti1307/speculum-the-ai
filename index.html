@@ -3,22 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Speculum AI 💎</title>
+  <title>Speculum AI Fitness</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="home-container">
-    <h1 class="app-title">💎 Speculum AI</h1>
-    <p class="tagline">Your Personal Fitness & Acting Trainer</p>
-
-    <div class="card">
-      <input type="text" id="username" placeholder="Enter your name" />
-      <button id="registerBtn">Register</button>
-      <button id="loginBtn">Login</button>
-      <button id="guestBtn" class="guest">Continue as Guest</button>
-    </div>
+  <div id="home" class="page active">
+    <h1>Welcome to Speculum AI 💎</h1>
+    <p>Your personal AI Fitness Trainer!</p>
+    <button onclick="showPage('login')">Login</button>
+    <button onclick="showPage('register')">Register</button>
   </div>
 
-  <script src="speculumai/home.js"></script>
+  <div id="login" class="page">
+    <h2>Login</h2>
+    <input type="text" id="loginName" placeholder="Enter your name" />
+    <button onclick="login()">Login</button>
+    <button onclick="showPage('home')">Back</button>
+  </div>
+
+  <div id="register" class="page">
+    <h2>Register</h2>
+    <input type="text" id="registerName" placeholder="Enter your name" />
+    <button onclick="register()">Register</button>
+    <button onclick="showPage('home')">Back</button>
+  </div>
+
+  <div id="dashboard" class="page">
+    <h2 id="greeting"></h2>
+    <p>Select an exercise to start!</p>
+    <button onclick="startExercise('Squats', 10)">Squats</button>
+    <button onclick="startExercise('Push-ups', 10)">Push-ups</button>
+    <button onclick="startExercise('Jumping Jacks', 10)">Jumping Jacks</button>
+    <button onclick="startExercise('Lunges', 10)">Lunges</button>
+    <button onclick="startExercise('Plank', 10)">Plank</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div id="exercise" class="page">
+    <h2 id="exerciseName"></h2>
+    <p id="instruction"></p>
+    <p id="timer"></p>
+    <button onclick="nextExercise()">Next</button>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

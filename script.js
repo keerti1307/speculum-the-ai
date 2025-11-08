@@ -1,99 +1,86 @@
-const doll = document.getElementById("doll");
-const timerDisplay = document.getElementById("timer");
-const greeting = document.getElementById("greeting");
-let currentMode = "", currentIndex = 0, countdown;
+let user = "";
+let currentExercise = "";
+let exerciseList = [];
+let timer;
+let timeLeft = 25; // constant timer
 
-const user = localStorage.getItem("speculumUser");
-greeting.textContent = user
-  ? `Hey ${user}, welcome back! Ready for your session? 💪`
-  : "Welcome to Speculum AI! Let’s get started.";
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach((page) => {
+    page.classList.remove("active");
+  });
+  document.getElementById(pageId).classList.add("active");
+}
 
-const speak = (text) => {
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "en-IN";
-  utter.rate = 1;
-  speechSynthesis.speak(utter);
-};
+function register() {
+  const name = document.getElementById("registerName").value.trim();
+  if (name) {
+    localStorage.setItem("user", name);
+    alert("Registration successful!");
+    showPage("login");
+  } else {
+    alert("Please enter your name!");
+  }
+}
 
-const fitnessMoves = [
-  "Do 10 squats.",
-  "Stretch your arms upward for 10 seconds.",
-  "Do 5 push-ups.",
-  "Rotate your neck slowly.",
-  "Jump lightly in place for 15 seconds.",
-  "Touch your toes and hold for 5 seconds.",
-  "Do 15 jumping jacks.",
-  "Sit down and take 3 deep breaths.",
-  "Do 10 lunges on each leg.",
-  "Hold a plank for 20 seconds.",
-  "Do 10 sit-ups.",
-  "Do 20 arm circles.",
-  "Stand on one leg for 10 seconds.",
-  "Side stretch to the left and right.",
-  "Relax your shoulders and roll them back."
-];
+function login() {
+  const name = document.getElementById("loginName").value.trim();
+  const storedName = localStorage.getItem("user");
 
-const actingPrompts = [
-  "Act surprised for 5 seconds!",
-  "Show me a confident smile.",
-  "Pretend to cry like in a movie scene.",
-  "Act like you’re talking to your best friend.",
-  "Do a dramatic pose and hold it!",
-  "Pretend to be giving a speech to a crowd.",
-  "Show your angry face for 5 seconds!",
-  "Act sleepy and then suddenly excited!",
-  "Do a slow-motion walk like in a film.",
-  "Imitate your favorite actor’s expression!",
-  "Pretend to answer a phone call dramatically.",
-  "Act like you just won an award.",
-  "Pretend to be scared of something imaginary.",
-  "Do a slow villain laugh.",
-  "Pretend you’re hosting a TV show!"
-];
+  if (name && name === storedName) {
+    user = name;
+    document.getElementById("greeting").innerText = `Hey ${user}, welcome back 👋`;
+    showPage("dashboard");
+  } else {
+    alert("User not found! Please register first.");
+  }
+}
 
-function startCountdown(seconds, callback) {
-  let remaining = seconds;
-  timerDisplay.textContent = `⏳ ${remaining}s`;
-  clearInterval(countdown);
+function logout() {
+  user = "";
+  showPage("home");
+}
 
-  countdown = setInterval(() => {
-    remaining--;
-    if (remaining <= 0) {
-      clearInterval(countdown);
-      timerDisplay.textContent = "✅ Done!";
-      setTimeout(callback, 1500);
-    } else {
-      timerDisplay.textContent = `⏳ ${remaining}s`;
+function startExercise(exercise, count) {
+  currentExercise = exercise;
+  exerciseList = [
+    { name: exercise, count },
+    { name: "Push-ups", count: 10 },
+    { name: "Jumping Jacks", count: 10 },
+    { name: "Lunges", count: 10 },
+    { name: "Plank", count: 10 }
+  ];
+  showExercise(exerciseList[0]);
+}
+
+function showExercise(ex) {
+  document.getElementById("exerciseName").innerText = ex.name;
+  document.getElementById("instruction").innerText = `Do ${ex.count} ${ex.name}!`;
+  showPage("exercise");
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timer);
+  timeLeft = 25; // always 25 seconds
+  document.getElementById("timer").innerText = `⏱️ ${timeLeft} seconds left`;
+
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = `⏱️ ${timeLeft} seconds left`;
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      alert("Time's up! Great job 💪");
     }
   }, 1000);
 }
 
-function startRoutine(mode) {
-  currentMode = mode;
-  currentIndex = 0;
-  doll.textContent = `🩵 Starting ${mode} mode...`;
-  speak(`Starting ${mode} mode! Get ready.`);
-  setTimeout(giveNextInstruction, 3000);
-}
-
-function giveNextInstruction() {
-  const list = currentMode === "fitness" ? fitnessMoves : actingPrompts;
-  if (currentIndex >= list.length) {
-    speak("Workout complete! Great job!");
-    doll.textContent = "🏁 All done! You did amazing!";
-    timerDisplay.textContent = "";
-    return;
+function nextExercise() {
+  const nextIndex = exerciseList.findIndex((e) => e.name === currentExercise) + 1;
+  if (nextIndex < exerciseList.length) {
+    currentExercise = exerciseList[nextIndex].name;
+    showExercise(exerciseList[nextIndex]);
+  } else {
+    alert("Workout complete! 🎉");
+    showPage("dashboard");
   }
-
-  const instruction = list[currentIndex];
-  doll.textContent = instruction;
-  speak(instruction);
-
-  startCountdown(25, () => {
-    currentIndex++;
-    giveNextInstruction();
-  });
 }
-
-document.getElementById("fitnessBtn").onclick = () => startRoutine("fitness");
-document.getElementById("actingBtn").onclick = () => startRoutine("acting");
